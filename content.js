@@ -27,6 +27,8 @@ let styles = ["style", "opacity:0.1;"];
 
 // Receive paywall links from background.js and style them
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log("Content loop");
+
   if (request.paywallList.length) {
     console.log("Saved paywalled links: ", request.paywallList.length);
 

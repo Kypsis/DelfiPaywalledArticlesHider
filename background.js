@@ -15,67 +15,28 @@
   });
 }); */
 
-let seenBeforeLinks = JSON.parse(localStorage.getItem("seenBeforeLinks")) || [];
-window.paywalledLinks =
-  JSON.parse(localStorage.getItem("paywalledLinks")) || [];
-
 // Listen for links from content.js and store new links
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  const newLinks = request.links.filter(
-    item => seenBeforeLinks.indexOf(item) == -1
-  );
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+  console.log("Background loop");
 
-  console.log("New links: ", newLinks.length);
-
-  // Fetch new links that contain paywall regex
-  Promise.all(
-    newLinks.map(async url => {
-      return {
-        url: url,
-        paywall: await fetch(url)
-          .then(response => response.text())
-          .then(text =>
-            /pyfe-overlay|paywall-component="paywall"|class="paywall-container"/g.test(
-              text
-            )
-          )
-          .catch(error => console.log(error))
-      };
-    })
+  const delfiPaywalledLinks = await fetch(
+    "http://ec2-18-185-111-192.eu-central-1.compute.amazonaws.com:3000/delfi"
   )
-    .then(results =>
-      // Convert array of objects to an array where every link is paywall link
-      results.filter(item => item.paywall === true).map(item => item.url)
-    )
-    .then(newPaywallLinks => {
-      // Store new paywall links
-      window.paywalledLinks = window.paywalledLinks.length
-        ? [...window.paywalledLinks, ...newPaywallLinks]
-        : [...newPaywallLinks];
-      localStorage.setItem(
-        "paywalledLinks",
-        JSON.stringify(window.paywalledLinks)
-      );
+    .then(response => response.json())
+    .then(links => links.filter(link => link.Paywalled === true));
+  console.log("Delfi paywalled links: ", delfiPaywalledLinks.length);
 
-      // Store all unique links and only add when new unique link
-      seenBeforeLinks = seenBeforeLinks.length
-        ? [...new Set([...seenBeforeLinks, ...newLinks])]
-        : [...newLinks];
-      localStorage.setItem("seenBeforeLinks", JSON.stringify(seenBeforeLinks));
+  const postimeesPaywalledLinks = await fetch(
+    "http://ec2-18-185-111-192.eu-central-1.compute.amazonaws.com:3000/delfi"
+  )
+    .then(response => response.json())
+    .then(links => links.filter(link => link.Paywalled === true));
+  console.log("Postimees paywalled links: ", delfiPaywalledLinks.length);
 
-      console.log("Total saved links: ", seenBeforeLinks.length);
-      console.log("Saved paywall links: ", window.paywalledLinks.length);
-
-      // Send paywalled links to content.js
-      chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          paywallList: window.paywalledLinks
-        });
-      });
+  // Send paywalled links to content.js
+  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      paywallList: paywalledLinks
     });
-});
-
-// When clicking extension icon create new page with paywall links
-chrome.browserAction.onClicked.addListener(tab => {
-  chrome.tabs.create({ url: "popup.html" });
+  });
 });

@@ -1,15 +1,19 @@
 {
-  "name": "Delfi/Postimees Paywall Detector VERSION 1",
+  "name": "Delfi/Postimees Paywall Detector VERSION 2",
   "version": "1.0",
   "manifest_version": 2,
   "content_scripts": [
     {
-      "matches": ["*://*.delfi.ee/*", "*://*.postimees.ee/*"],
+      "matches": [
+        "*://*.delfi.ee/*",
+        "*://*.postimees.ee/*",
+        "http://ec2-18-185-111-192.eu-central-1.compute.amazonaws.com:3000/delfi"
+      ],
       "js": ["content.js"]
     }
   ],
   "browser_action": {
-    "default_title": "Delfi/Postimees Paywall Detector VERSION 1",
+    "default_title": "Delfi/Postimees Paywall Detector VERSION 2",
     "default_icon": {
       "16": "images/pw16.png",
       "32": "images/pw32.png",
