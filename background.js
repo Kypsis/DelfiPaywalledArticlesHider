@@ -17,8 +17,6 @@
 
 // Listen for links from content.js and store new links
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  console.log("Background loop");
-
   const delfiPaywalledLinks = await fetch(
     "http://ec2-18-185-111-192.eu-central-1.compute.amazonaws.com:3000/delfi"
   )
@@ -27,11 +25,16 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   console.log("Delfi paywalled links: ", delfiPaywalledLinks.length);
 
   const postimeesPaywalledLinks = await fetch(
-    "http://ec2-18-185-111-192.eu-central-1.compute.amazonaws.com:3000/delfi"
+    "http://ec2-18-185-111-192.eu-central-1.compute.amazonaws.com:3000/postimees"
   )
     .then(response => response.json())
     .then(links => links.filter(link => link.Paywalled === true));
-  console.log("Postimees paywalled links: ", delfiPaywalledLinks.length);
+  console.log("Postimees paywalled links: ", postimeesPaywalledLinks.length);
+
+  const paywalledLinks = [
+    ...new Set([...delfiPaywalledLinks, ...postimeesPaywalledLinks])
+  ].map(item => item.Url);
+  console.log(paywalledLinks);
 
   // Send paywalled links to content.js
   chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
