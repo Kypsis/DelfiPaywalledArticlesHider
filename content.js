@@ -41,13 +41,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             ? item.closest(".headline").setAttribute(...styles)
             : item.setAttribute(...styles)
         );
-      /* document
-        .querySelectorAll(`a[href="${link}"]`)
-        .forEach(item =>
-          item.closest(".list-article")
-            ? item.closest(".list-article").setAttribute(...styles)
-            : item.setAttribute(...styles)
-        ); */
       document
         .querySelectorAll(`a[href="${relativeLink}"]`)
         .forEach(item =>
@@ -55,13 +48,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             ? item.closest(".headline").setAttribute(...styles)
             : item.setAttribute(...styles)
         );
-      /* document
-        .querySelectorAll(`a[href="${relativeLink}"]`)
-        .forEach(item =>
-          item.closest(".list-article")
-            ? item.closest(".list-article").setAttribute(...styles)
-            : item.setAttribute(...styles)
-        ); */
     });
   }
 });

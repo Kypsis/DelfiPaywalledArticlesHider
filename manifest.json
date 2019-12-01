@@ -31,5 +31,5 @@
     "48": "images/pw48.png",
     "128": "images/pw128.png"
   },
-  "permissions": ["tabs", "storage", "declarativeContent"]
+  "permissions": ["tabs"]
 }
