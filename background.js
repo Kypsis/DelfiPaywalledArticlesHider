@@ -1,40 +1,23 @@
-// Restrict page action (icon grayed out) to only delfi.ee and postimees.ee
-// BUGGED. TODO: check why the click functionality on icon bugs out.
-/* chrome.runtime.onInstalled.addListener(() => {
-  chrome.declarativeContent.onPageChanged.removeRules(undefined, () => {
-    chrome.declarativeContent.onPageChanged.addRules([
-      {
-        conditions: [
-          new chrome.declarativeContent.PageStateMatcher({
-            pageUrl: { hostEquals: ["*.delfi.ee/*", "*.postimees.ee/*"] }
-          })
-        ],
-        actions: [new chrome.declarativeContent.ShowPageAction()]
-      }
-    ]);
-  });
-}); */
-
 // Listen for links from content.js and store new links
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   const delfiPaywalledLinks = await fetch(
     "http://ec2-18-185-111-192.eu-central-1.compute.amazonaws.com:3000/delfi"
   )
     .then(response => response.json())
-    .then(links => links.filter(link => link.Paywalled === true));
-  console.log("Delfi paywalled links: ", delfiPaywalledLinks.length);
+    .then(links => links.filter(link => link.Paywalled === true))
+    .catch(error => console.log(error));
 
   const postimeesPaywalledLinks = await fetch(
     "http://ec2-18-185-111-192.eu-central-1.compute.amazonaws.com:3000/postimees"
   )
     .then(response => response.json())
-    .then(links => links.filter(link => link.Paywalled === true));
-  console.log("Postimees paywalled links: ", postimeesPaywalledLinks.length);
+    .then(links => links.filter(link => link.Paywalled === true))
+    .catch(error => console.log(error));
 
   const paywalledLinks = [
     ...new Set([...delfiPaywalledLinks, ...postimeesPaywalledLinks])
   ].map(item => item.Url);
-  console.log(paywalledLinks);
+  console.log("Combined paywalled links length: ", paywalledLinks.length);
 
   // Send paywalled links to content.js
   chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
