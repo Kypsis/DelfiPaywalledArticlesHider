@@ -1,6 +1,6 @@
 {
   "name": "Delfi/Postimees Paywall Detector",
-  "version": "2.1",
+  "version": "2.2",
   "manifest_version": 2,
   "content_scripts": [
     {
